@@ -7,13 +7,29 @@ export const protect=async (req,res,next) => {
         return res.json({ success: false, message: "Not Authorized" });
     }
     try {
-        const userId = jwt.decode(token, process.env.JWT_SECRET);
-        if (!userId) {
-            return res.json({ success: false, message: "Not Authorized" });
-        }
-        req.user = await User.findById(userId).select("-password");
-        next()
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // get user from decoded.id
+    req.user = await User.findById(decoded.id).select("-password");
+
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: "User not found" });
+    }
+
+    next();
     } catch (error) {
-        return res.json({success:false,message:"Not Authorized"})
+        return res.json({success:false,message:"Not-Authorized"})
     }
 }
+
+export const authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized to access this resource"
+      });
+    }
+    next();
+  };
+};
