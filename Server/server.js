@@ -5,6 +5,7 @@ import connectDB from "./configs/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import userRouter from "./routes/userRoutes.js";
 import farmRouter from "./routes/FarmRoutes.js";
+import farmAnalyticsRouter from "./routes/farmAnalyticsRoutes.js";
 
 
 const app = express();
@@ -23,7 +24,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRouter);
 app.use("/api/farms", farmRouter)
-
+app.use("/api/analytics", farmAnalyticsRouter);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
