@@ -8,7 +8,10 @@ const userSchema = new mongoose.Schema({
         type: String, 
         enum: ["farmer", "expert", "admin", "buyer"], 
         default: "farmer" 
-    }
+    },
+    phone: { type: String, required: false },
+    lat: { type: String, required: false },
+    lon: { type: String, required: false }
 });
 const User = mongoose.model("User", userSchema);
 export default User;
