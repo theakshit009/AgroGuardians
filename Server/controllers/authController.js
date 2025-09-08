@@ -12,7 +12,7 @@ const generateToken = (user) => {
 
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, phone, lat, lon } = req.body;
 
     if (!name || !email || !password) {
       return res.json({ success: false, message: "Fill all the details" });
@@ -32,6 +32,9 @@ export const registerUser = async (req, res) => {
       email,
       password: hashedPassword,
       role: role || "farmer", 
+      phone,
+      lat,
+      lon
     });
 
     const token = generateToken(user);
