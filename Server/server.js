@@ -14,15 +14,32 @@ import cropRecommendationRouter from "./routes/cropRecommendationRoute.js";
 
 const app = express();
 
-await connectDB();
+// Initialize database connection (lazy connection for serverless)
+let dbConnected = false;
+const ensureDBConnection = async () => {
+  if (!dbConnected) {
+    await connectDB();
+    dbConnected = true;
+  }
+};
+
 //middleware
 app.use(cors());
 app.use(express.json());
 
-cron.schedule("59 22 * * *", async () => {
+// Ensure DB connection before handling requests
+app.use(async (req, res, next) => {
+  await ensureDBConnection();
+  next();
+});
+
+// Only schedule cron jobs if NOT in serverless environment
+if (process.env.VERCEL !== "1") {
+  cron.schedule("59 22 * * *", async () => {
     console.log("⏰ Cron is working:", new Date().toLocaleString());
     await sendDailyWeatherAlerts();
-});
+  });
+}
 
 //routes
 app.get("/", (req, res) => {
@@ -36,9 +53,13 @@ app.use("/api/analytics", farmAnalyticsRouter);
 app.use("/api/weather", weatherRouter);
 app.use("/api/crop-recommendation", cropRecommendationRouter);
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+// Only start server if NOT in serverless environment (Vercel)
+if (process.env.VERCEL !== "1") {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
     console.log(`server is running on port ${PORT}`);
-})
+  });
+}
 
+// Export for Vercel serverless functions
 export default app;
