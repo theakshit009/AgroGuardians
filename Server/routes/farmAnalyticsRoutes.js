@@ -8,7 +8,6 @@ import {
 
 const farmAnalyticsRouter = express.Router();
 
-// All routes protected (farmer or admin)
 farmAnalyticsRouter.get("/summary", protect, getFarmSummary);
 farmAnalyticsRouter.get("/report", protect, getCropReport);
 farmAnalyticsRouter.get("/monthly/:month/:year", protect, getMonthlyReport);
